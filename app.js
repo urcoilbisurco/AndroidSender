@@ -24,7 +24,7 @@ app.get('/', function(req, res){
 app.post('/send', function(req, res){
 	console.log(req.body.url)
 	io.sockets.emit('message', { type: "url" , url: req.body.url });
-
+	console.log("messaggio inviato");
 	
 	res.redirect("back");
 });
