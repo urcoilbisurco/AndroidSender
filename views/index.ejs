@@ -5,10 +5,20 @@
 <input type="submit" />
 </form>
 
+<form action="/api/message" method="POST">
+	url:
+<input type="text" name="url" />
+	token:
+<input type="text" name="auth" />
+<input type="submit" />
+</form>
 
-<script>
-  var socket = io.connect('http://growing-autumn-1715.herokuapp.com/');
-  socket.on('message', function (data) {
-    console.log(data.url);
-  });
-</script>
+<form action="/api/auth" method="POST">
+	email
+<input type="text" name="email" />
+	token
+<input type="text" name="auth" />
+<input type="submit" />
+</form>
+
+
