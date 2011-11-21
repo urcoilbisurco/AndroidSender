@@ -90,17 +90,17 @@ app.post('/api/auth', function(req,res){
 				console.log("user "+ req.body.email +" is logged in (it was already registered)");
 				//res.send("ok, user logged in");
 			} else{
-				// get email and token and store in two separate redis elements:
-				// i create also a list of email, just in case i need it for comunicate something
-				redis.rpush('users', req.body.email);
-				redis.set(key, req.body.auth)
-				// it don't need to create the list for the urls, will be created the first time a url is pushed
-				//res.send("ok, user created");
+				console.log("esiste già: " + req.body.email + "-" + auth);
+				//res.send("the email '#{email} already exists with another password, #{forgot my password link?}");
 			}
 		} else {
-			console.log("esiste già: " + req.body.email + "-" + user);
-			//res.send("the email '#{email} already exists with another password, #{forgot my password link?}");
-		}
+			// get email and token and store in two separate redis elements:
+			// i create also a list of email, just in case i need it for comunicate something
+			redis.rpush('users', req.body.email);
+			redis.set(key, req.body.auth)
+			// it don't need to create the list for the urls, will be created the first time a url is pushed
+			//res.send("ok, user created");
+		}		
 	});
 	res.redirect("back");
 });
