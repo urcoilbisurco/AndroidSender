@@ -7,7 +7,14 @@ var config= require('./config.js'),
 	app=config.app,
 	io=config.io,
 	r=config.r;
-	redis=r.createClient();
+	if (process.env.REDISTOGO_URL) {
+		var rtg   = require("url").parse(process.env.REDISTOGO_URL);
+		var redis = r.createClient(rtg.port, rtg.hostname);
+		redis.auth(rtg.auth.split(":")[1]);
+	} else {
+	  var redis =r.createClient();
+	}
+	
 	
 	io.sockets.on('connection', function(socket){
 		console.log("ho ricevuto una connessione");
