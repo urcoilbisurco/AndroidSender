@@ -19,17 +19,18 @@ var config= require('./config.js'),
 	io.sockets.on('connection', function(socket){
 		console.log("ho ricevuto una connessione");
 	  	socket.on('getAuth', function(data, fn){
-			socket.join(data);
 			socket.auth=data;
-			console.log("auth ricevuto:"+data);
 			//store redis activeUsers the auth;
-			redis.sadd("activeUsers", socket.auth);
+			if(redis.sadd("activeUsers", socket.auth)){
+				console.log("the user is not activeuser");
+				socket.join(data);
+				console.log("auth ricevuto:"+data);
+			}
 			var key="m:"+socket.auth;
 			redis.lrange(key, 0 , -1, function(err, urls){
-				console.log(urls)
-				//socket.emit("oldData", urls );
-				fn(urls);
+				console.log(urls);
 				redis.del(key, function(err, res){});
+				fn(urls);
 			});
 		});
 		
@@ -50,13 +51,7 @@ app.get('/', function(req, res){
 });
 
 
-//old version, it's here to work the old (no auth) android client and extension;
-app.post('/send', function(req, res){
-	console.log(req.body.url)
-	io.sockets.emit('message', { type: "url" , url: req.body.url });
-	console.log("messaggio inviato");
-	res.redirect("back");
-});
+
 
 //new version, with auth support for multi user!
 
@@ -65,16 +60,16 @@ app.post('/api/message', function(req, res){
 	console.log("ricevuto messaggio da " + req.body.auth + " e l'url è "+ req.body.url);
 	redis.sismember("activeUsers", req.body.auth, function(err,res){
 		console.log("is activeuser: " + !!res);
-	if(res){
-		console.log(req.body.auth + " è già collegato");
-		io.sockets.in(req.body.auth).emit('message', { type:"url", url: req.body.url});
-	}else{
+		if(res){
+			console.log(req.body.auth + " è già collegato");
+			io.sockets.in(req.body.auth).emit('message', { type:"url", url: req.body.url});
+		}else{
 		
-		console.log(req.body.auth + " non è collegato, registro il dato");
-		key="m:"+req.body.auth;
-		//store in redis db and wait that the client connects;
-		redis.rpush(key, req.body.url);
-	}
+			console.log(req.body.auth + " non è collegato, registro il dato");
+			key="m:"+req.body.auth;
+			//store in redis db and wait that the client connects;
+			redis.rpush(key, req.body.url);
+		}
 	});
 	res.redirect("back");
 		
