@@ -19,7 +19,7 @@ var config= require('./config.js'),
 	io.sockets.on('connection', function(socket){
 		console.log("ho ricevuto una connessione");
 	  	socket.on('getAuth', function(data, fn){
-		
+			socket.auth=data;
 			redis.sismember("activeUsers", data, function(err,res){
 				console.log("this user is already in activeUser array? " + !!res);
 				if(res){
@@ -27,7 +27,6 @@ var config= require('./config.js'),
 				}else{
 					console.log("no it isn't!");
 					socket.join(data);
-					socket.auth=data;
 					console.log("auth ricevuto:"+data);
 					//store redis activeUsers the auth;
 					redis.sadd("activeUsers", socket.auth)
