@@ -19,21 +19,25 @@ var config= require('./config.js'),
 	io.sockets.on('connection', function(socket){
 		console.log("ho ricevuto una connessione");
 	  	socket.on('getAuth', function(data, fn){
-		//fix for multiple urls on extension
-			socket.leave(data);
-			
-				
-			socket.join(data);
-			socket.auth=data;
-			console.log("auth ricevuto:"+data);
-			//store redis activeUsers the auth;
-			redis.sadd("activeUsers", socket.auth)
-			
-			var key="m:"+socket.auth;
-			redis.lrange(key, 0 , -1, function(err, urls){
-				console.log(urls)
-				redis.del(key, function(err, res){});
-				fn(urls);
+		
+			redis.sismember("activeUsers", data, function(err,res){
+				console.log("this user is already in activeUser array? " + !!res);
+				if(res){
+					console.log("yes is it!");
+				}else{
+					console.log("no it isn't!");
+					socket.join(data);
+					socket.auth=data;
+					console.log("auth ricevuto:"+data);
+					//store redis activeUsers the auth;
+					redis.sadd("activeUsers", socket.auth)
+				}
+				var key="m:"+socket.auth;
+				redis.lrange(key, 0 , -1, function(err, urls){
+					console.log(urls)
+					redis.del(key, function(err, res){});
+					fn(urls);
+				});
 			});
 		});
 		
