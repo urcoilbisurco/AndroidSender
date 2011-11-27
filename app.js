@@ -29,7 +29,6 @@ var config= require('./config.js'),
 			//store redis activeUsers the auth;
 			redis.sadd("activeUsers", socket.auth)
 			
-			console.log("ciao" + red);
 			var key="m:"+socket.auth;
 			redis.lrange(key, 0 , -1, function(err, urls){
 				console.log(urls)
