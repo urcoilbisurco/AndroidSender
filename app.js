@@ -14,8 +14,7 @@ var config= require('./config.js'),
 	} else {
 	  var redis =r.createClient();
 	}
-	
-	
+	redis.del("activeUsers");
 	io.sockets.on('connection', function(socket){
 		console.log("ho ricevuto una connessione");
 	  	socket.on('getAuth', function(data, fn){
@@ -25,12 +24,21 @@ var config= require('./config.js'),
 				if(res){
 					console.log("yes is it!");
 				}else{
+					
 					console.log("no it isn't!");
+					console.log(socket.id)
+					console.log("PRIMO");
 					socket.join(data);
+					console.log("SECONDO");
+				
+					//importante per trovare una soluzione!!!!!	
+					//onsole.log(socket.join(data).namespace.manager.roomClients);
 					console.log("auth ricevuto:"+data);
 					//store redis activeUsers the auth;
-					redis.sadd("activeUsers", socket.auth)
+					redis.sadd("activeUsers", socket.auth);
 				}
+				console.log("rooms:");
+				console.log(io.sockets.manager.rooms);
 				var key="m:"+socket.auth;
 				redis.lrange(key, 0 , -1, function(err, urls){
 					console.log(urls)

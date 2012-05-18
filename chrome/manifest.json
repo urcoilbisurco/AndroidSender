@@ -1,0 +1,13 @@
+{
+	"name": "sender chrome extension",
+ 
+	"version": "0.2",
+ 
+	"description": "Get links and images from android",
+ 
+	"background_page": "background.html",
+	"options_page": "options.html",
+	"permissions": [
+    	"tabs"
+  	]
+}
